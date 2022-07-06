@@ -1,3 +1,12 @@
+; ============= CONFIG =============
+    global sleepGetFromWB = 100 ; czas jaki skrypt czeka zanim odbierze craftowane rzeczy z craftingu, 
+    global sleepGetItem = 50     ; czas po podniesieniu itemka z inventory
+    global sleepPutItem = 50     ; czas po tym jak item zostanie umieszczony w craftingu
+
+; ============= CONFIG =============
+
+
+
 #SingleInstance Force
 #NoEnv
 SetWorkingDir %A_ScriptDir%
@@ -67,9 +76,9 @@ Bloczki(){
                 rowCounter := 0
             }
             click %xInventory%, %yInventory% ; klik w eq
-            sleep 30
+            sleep %sleepGetItem%
             click %xCrafting%, %yCrafting% ;klik w craftingu
-            sleep 50
+            sleep %sleepPutItem%
 
             if (tnt = 1) and (mod(colCounter,2))
                 xInventory := xInventory - 5 * deltaSLOTA
@@ -80,13 +89,13 @@ Bloczki(){
             colCounter++
         }
 
-        sleep 10
+        sleep %sleepGetFromWB%
         send {LSHIFT down} ;odbieram bloki z craftingu
-        sleep 10
+        sleep 40
         click %xGetCreatedItems%, %yGetCreatedItems%
-        sleep 20
+        sleep 40
         send {LSHIFT up}
-        
+
         yInventory:= yInventory+ deltaSLOTA ; zeby zjerzało na kolejny wiersz
         if guiscale = GuiScale: NORMAL
         {
