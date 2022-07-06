@@ -4,8 +4,8 @@ SetWorkingDir %A_ScriptDir%
 SetBatchLines -1
 SetMouseDelay, -1
 global hotkey1, tryb, paski, guiscale
-global Xstart, Ystart, X, Y, X2, Y2, X3, Y3
-global i := 0, l := 0
+global xStart, yStart, xInventory, yInventory, xCrafting, yCrafting, xGetCreatedItems, xGetCreatedItems
+global rowCounter := 0, colCounter := 0
 global tnt = 1, bloki
 global deltaSLOTA
 global colorC2, colorC
@@ -20,115 +20,99 @@ Gui Add, Button, x101 y175 w80 h23 gSTART, ZACZYNAMY
 Gui Show, w281 h209, Crafting itemków Maciusssiek
 Return
 
-START:
-Gui submit
-Gui hide
-Hotkey, ~*$%hotkey1%, Bloczki
-
-
-
-
-loop
-sleep 1
-
-
 Bloczki(){
-if A_Cursor = Unknown
-return
-MouseGetPos Xstart, Ystart
-X := Xstart - 223 ; kordy pierwszego slota eq os X
-Y := Ystart + 21 ; kordy pierwszego slota eq os Y
-if guiscale = GuiScale: NORMAL
-{
-X := Xstart - 144 ; kordy pierwszego slota eq os X
-Y := Ystart + 18 ; kordy pierwszego slota eq os Y
+    if A_Cursor = Unknown
+        return
+    MouseGetPos xStart, yStart
+
+    if guiscale = GuiScale: NORMAL
+    {
+        xInventory := xStart - 140 ; kordy pierwszego slota eq os X
+        yInventory:= yStart + 20 ; kordy pierwszego slota eq os Y
+        xCrafting := xStart - 100 ; kordy slota w craftingu
+        yCrafting := yStart - 120 ; kordy slota w craftingu
+        xGetCreatedItems := xStart + 80 ; kordy gdzie obierasz bloki
+        xGetCreatedItems := yStart - 80 ; Y gdzie odbierasz bloki
+        deltaSLOTA = 35
+    } else {
+        xInventory := xStart - 220 ; kordy pierwszego slota eq os X
+        yInventory := yStart + 20 ; kordy pierwszego slota eq os Y
+        xCrafting := xStart - 150 ; kordy slota w craftingu
+        yCrafting := yStart - 180 ; kordy slota w craftingu
+        xGetCreatedItems := xStart + 130 ; kordy gdzie obierasz bloki
+        yGetCreatedItems := yStart - 120 ; Y gdzie odbierasz bloki
+        deltaSLOTA = 56
+    }
+
+    loop %paski%
+    {
+        if A_Cursor = Unknown
+            return
+        loop 9 {
+            if A_Cursor = Unknown
+                return
+            if (tnt = 1) and (mod(colCounter,2))
+                xInventory := xInventory + 4 * deltaSLOTA
+            if rowCounter = 3
+            {	
+                if guiscale = GuiScale: NORMAL
+                {
+                    xCrafting := xStart - 100 ; kordy slota w craftingu
+                    yCrafting := yCrafting + 30 ; kordy slota w craftingu
+                }
+                else {
+                    xCrafting := xStart - 160
+                    yCrafting := yCrafting + 50
+                }
+                rowCounter := 0
+            }
+            click %xInventory%, %yInventory% ; klik w eq
+            sleep 30
+            click %xCrafting%, %yCrafting% ;klik w craftingu
+            sleep 50
+
+            if (tnt = 1) and (mod(colCounter,2))
+                xInventory := xInventory - 5 * deltaSLOTA
+
+            xInventory := xInventory + deltaSLOTA
+            xCrafting := xCrafting + deltaSLOTA
+            rowCounter++
+            colCounter++
+        }
+
+        sleep 10
+        send {LSHIFT down} ;odbieram bloki z craftingu
+        sleep 10
+        click %xGetCreatedItems%, %yGetCreatedItems%
+        sleep 20
+        send {LSHIFT up}
+        
+        yInventory:= yInventory+ deltaSLOTA ; zeby zjerzało na kolejny wiersz
+        if guiscale = GuiScale: NORMAL
+        {
+            xInventory := xStart - 144 ; kordy pierwsze
+            xCrafting := xStart - 101 ; kordy slota w craftingu
+            yCrafting := yStart - 118 ; kordy slota w craftingu
+        }
+        else {
+            xInventory := xStart - 223 ; kordy pierwszego slota na osi X
+            xCrafting := xStart - 153 ; kordy slota w craftingu
+            yCrafting := yStart - 177 ; kordy slota w craftingu
+        }
+
+        rowCounter := 0
+        colCounter := 0
+    }
+
+    return
 }
 
-
-X2 := Xstart - 153 ; kordy slota w craftingu
-Y2 := Ystart - 177 ; kordy slota w craftingu
-if guiscale = GuiScale: NORMAL
-{
-X2 := Xstart - 101 ; kordy slota w craftingu
-Y2 := Ystart - 118 ; kordy slota w craftingu
-}
-
-X3 := Xstart + 133 ; kordy gdzie obierasz bloki
-Y3 := Ystart - 122 ; Y gdzie odbierasz bloki
-if guiscale = GuiScale: NORMAL
-{
-X3 := Xstart + 85 ; kordy gdzie obierasz bloki
-Y3 := Ystart - 77 ; Y gdzie odbierasz bloki
-}
-deltaSLOTA = 56
-
-if guiscale = GuiScale: NORMAL
-{
-deltaSLOTA = 35
-}
-
-loop %paski%
-{
-if A_Cursor = Unknown
-return
-	loop 9 {
-		if A_Cursor = Unknown
-		return
-		if (tnt = 1) and (l = 1 or l = 3 or l = 5 or l = 7)
-			X := X + 4 * deltaSLOTA
-		if i = 3
-		{	
-				if guiscale = GuiScale: NORMAL
-				{
-					X2 := Xstart - 104 ; kordy slota w craftingu
-					Y2 := Y2 + 32 ; kordy slota w craftingu
-				}
-				else {
-						X2 := Xstart - 160
-						Y2 := Y2 + 50
-					}
-			i := 0
-		}
-		click %X%, %Y% ; klik w eq
-		sleep 1
-		click %X2%, %Y2% ;klik w craftingu
-		sleep 1
-		if (tnt = 1) and (l = 1 or l = 3 or l = 5 or l = 7)
-			X := X - 5 * deltaSLOTA
-		X := X + deltaSLOTA
-		X2 := X2 + deltaSLOTA
-		i++
-		l++
-	}
-	
-sleep 10
-send {LSHIFT down} ;odbieram bloki z craftingu
-sleep 250
-click %X3%, %Y3%
-sleep 40
-send {LSHIFT up}
-sleep 80
-tooltip,
-Y := Y + deltaSLOTA ; zeby zjerzało na kolejny wiersz
-	if guiscale = GuiScale: NORMAL
-				{
-					X := Xstart - 144 ; kordy pierwsze
-					X2 := Xstart - 101 ; kordy slota w craftingu
-					Y2 := Ystart - 118 ; kordy slota w craftingu
-				}
-				else {
-						X := Xstart - 223 ; kordy pierwszego slota na osi X
-						X2 := Xstart - 153 ; kordy slota w craftingu
-						Y2 := Ystart - 177 ; kordy slota w craftingu
-					}
-
-i := 0
-l := 0
-}
-
-return
-}
+START:
+    Gui submit
+    Gui hide
+    Hotkey, ~*$%hotkey1%, Bloczki
+Return
 
 GuiEscape:
 GuiClose:
-    ExitApp
+ExitApp
